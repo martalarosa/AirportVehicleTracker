@@ -1,0 +1,9 @@
+stages:
+  - test
+
+
+unittest:
+  stage: test
+  image: python:3.9
+  script:
+    - python -m unittest discover -s . -p "test_lab3.py"
