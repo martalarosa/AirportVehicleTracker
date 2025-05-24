@@ -1,17 +1,35 @@
-﻿''' данный код реализует систему для создания и управления различными типами транспортных средств, которые могут быть использованы в аэропорту. 
+''' данный код реализует систему для создания и управления различными типами транспортных средств, которые могут быть использованы в аэропорту. 
 каждое транспортное средство генерируется со случайными параметрами, такими как объём топлива, дни стоянки, расположение, количество пассажиров и т.д.
 программа предоставляет графический интерфейс для фильтрации и сортировки транспортных средств по различным характеристикам.
 генерируются случайные данные для различных типов транспортных средств. 
 транспортные средства пользователем выборочно фильтруются по всевозможным параметрам и сортируются по выбранным характеристикам.
-визуализация данных происходит с помощью графического интерфейса Tkinter. '''
+визуализация данных происходит с помощью графического интерфейса Tkinter. 
+в архитектуре реализован паттерн "Итератор" для последовательного перебора и фильтрации транспортных средств с возможностью задания собственных условий обхода. '''
 
 import tkinter as tk
 import random
 from tkinter import ttk
 
+# класс-итератор
+class VehicleIterator:
+    def __init__(self, vehicles):
+        self._vehicles = vehicles
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index < len(self._vehicles):
+            result = self._vehicles[self._index]
+            self._index += 1
+            return result
+        raise StopIteration
+
+# базовый класс для всех транспортных средств
 class Vehicle:
-    # базовый класс для всех транспортных средств
-    def __init__(self, type_name, category, fuel_volume=0, days=0, current_day=0, location=0, cargo_weight=0, seats=0, passengers=0, rockets=0, required_position=0, gas_station=0):
+    def __init__(self, type_name, category, fuel_volume=0, days=0, current_day=0, location=0, cargo_weight=0, seats=0, passengers=0, rockets=0, 
+                 required_position=0, gas_station=0):
         self.type = type_name   # конкретный тип
         self.category = category   # обобщённый тип
         self.fuel_volume = fuel_volume
@@ -110,7 +128,8 @@ def generate_vehicles():
 def display_vehicles(v_list):
     text_area.config(state=tk.NORMAL)
     text_area.delete("1.0", tk.END)
-    for v in v_list:
+    iterator = VehicleIterator(v_list)  # создаём итератор
+    for v in iterator:
         for attr, val in v.__dict__.items():
             text_area.insert(tk.END, f"{attr}: {val}\n")
         text_area.insert(tk.END, "-" * 20 + "\n")
